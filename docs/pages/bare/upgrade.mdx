@@ -1,20 +1,65 @@
----
-title: Native project upgrade helper
-description: View file-by-file diffs of all the changes you need to make to your native projects to upgrade them to the next Expo SDK version.
----
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-import { TemplateBareMinimumDiffViewer } from '~/ui/components/TemplateBareMinimumDiffViewer';
+const Tab = createBottomTabNavigator();
 
-If you manage your native projects (previously known as bare workflow), to [upgrade to the latest Expo SDK](/workflow/upgrading-expo-sdk-walkthrough/), you have to make changes to your native projects. It can be a complex process to find which native file changes and what to update in which file.
+function HomeScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
+      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>🚀 Curiuar</Text>
+      <TouchableOpacity style={{ backgroundColor: "#2563eb", padding: 15, borderRadius: 20 }}>
+        <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>📦 बुक डिलीवरी</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
-The following guide provides diffs to compare native project files between your project's current SDK version and the target SDK version you want to upgrade. You can use them to make changes to your project depending on the `expo` package version your project uses. The tools on this page are similar to [React Native Upgrade Helper](https://react-native-community.github.io/upgrade-helper/). However, they are oriented around projects that use Expo modules and related tooling.
+function TrackScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>📍 लाइव ट्रैकिंग</Text>
+      <Text style={{ marginTop: 10, color: "gray" }}>(यहाँ मैप दिखेगा)</Text>
+    </View>
+  );
+}
 
-> Interested in avoiding upgrading native code altogether? See [Continuous Native Generation (CNG)](/workflow/continuous-native-generation/) to learn how Expo Prebuild can generate your native projects before a build.
+function ProfileScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>👤 मेरी प्रोफ़ाइल</Text>
+      <Text style={{ marginTop: 10, color: "gray" }}>नाम, मोबाइल, पेमेंट सेटिंग्स</Text>
+    </View>
+  );
+}
 
-## Upgrade native project files
-
-Once you have [upgraded your Expo SDK version and related dependencies](/workflow//upgrading-expo-sdk-walkthrough/#how-to-upgrade-to-the-latest-sdk-version), use the diff tool below to learn about changes you need to make to your native project and bring them up to date with the current Expo SDK version.
-
-Choose your **from SDK version** and **to SDK version** to see the generated diff. Then, apply those changes to your native projects by copying and pasting or manually making changes to the project files.
-
-<TemplateBareMinimumDiffViewer />
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
+            if (route.name === "होम") {
+              iconName = "home";
+            } else if (route.name === "ट्रैकिंग") {
+              iconName = "location";
+            } else if (route.name === "प्रोफ़ाइल") {
+              iconName = "person";
+            }
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: "#2563eb",
+          tabBarInactiveTintColor: "gray",
+          headerShown: false,
+        })}
+      >
+        <Tab.Screen name="होम" component={HomeScreen} />
+        <Tab.Screen name="ट्रैकिंग" component={TrackScreen} />
+        <Tab.Screen name="प्रोफ़ाइल" component={ProfileScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
