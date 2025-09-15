@@ -126,3 +126,87 @@ Each version of Expo SDK supports a minimum OS version of Android and iOS. For A
 <AndroidIOSCompatibilityTable />
 
 When deciding whether to upgrade your Expo SDK version, consider both Expo's SDK version and app store submission requirements, as described in the above table. Google Play Store and Apple App Store periodically increase their minimum required OS versions and API levels, which are required for new app submissions. Expo has no control over the app store requirements, and you should check [Google](https://developer.android.com/studio/build) and [Apple](https://developer.apple.com/news/upcoming-requirements/) for the current store submission requirements.
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet, Alert } from "react-native";
+
+export default function App() {
+  const [pickUp, setPickUp] = useState("");
+  const [dropOff, setDropOff] = useState("");
+  const [jobs, setJobs] = useState([]);
+
+  function addJob() {
+    if (!pickUp.trim() || !dropOff.trim()) {
+      Alert.alert("Error", "Pickup aur Drop-off donon bharen");
+      return;
+    }
+    const newJob = {
+      id: Date.now().toString(),
+      pickUp,
+      dropOff,
+      status: "Pending",
+    };
+    setJobs([newJob, ...jobs]);
+    setPickUp("");
+    setDropOff("");
+  }
+
+  function markDone(id) {
+    setJobs(jobs.map(j => j.id === id ? { ...j, status: "Done" } : j));
+  }
+
+  const renderItem = ({ item }) => (
+    <View style={styles.job}>
+      <View style={{flex:1}}>
+        <Text style={styles.title}>Pickup: {item.pickUp}</Text>
+        <Text>Drop: {item.dropOff}</Text>
+        <Text>Status: {item.status}</Text>
+      </View>
+      <TouchableOpacity style={styles.btn} onPress={() => markDone(item.id)}>
+        <Text style={{color:"#fff"}}>Mark Done</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Courier Sample App</Text>
+
+      <TextInput
+        placeholder="Pickup address"
+        value={pickUp}
+        onChangeText={setPickUp}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Drop-off address"
+        value={dropOff}
+        onChangeText={setDropOff}
+        style={styles.input}
+      />
+      <Button title="Add Delivery" onPress={addJob} />
+
+      <Text style={{marginTop:16, fontWeight:"bold"}}>Deliveries</Text>
+      <FlatList
+        data={jobs}
+        keyExtractor={(i) => i.id}
+        renderItem={renderItem}
+        ListEmptyComponent={<Text style={{marginTop:10}}>Koi delivery nahi hai.</Text>}
+      />
+
+      {/* Map Placeholder - Snack mein asli map nahi chalta, isliye placeholder */}
+      <View style={styles.mapPlaceholder}>
+        <Text>Map yahan aayega (Snack preview mein map limited hota hai)</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex:1, padding:16, paddingTop:48 },
+  header: { fontSize:20, fontWeight:"bold", marginBottom:12 },
+  input: { borderWidth:1, borderColor:"#ccc", padding:8, marginBottom:8, borderRadius:6 },
+  job: { flexDirection:"row", padding:10, borderWidth:1, borderColor:"#ddd", borderRadius:8, marginTop:8, alignItems:"center" },
+  title: { fontWeight:"bold" },
+  btn: { backgroundColor:"#007AFF", padding:8, borderRadius:6 },
+  mapPlaceholder: { height:140, marginTop:16, borderWidth:1, borderColor:"#aaa", alignItems:"center", justifyContent:"center", borderRadius:8 }
+});
