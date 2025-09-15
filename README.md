@@ -125,3 +125,71 @@ Curious about who makes Expo? Here are our [team members](https://expo.dev/about
 The Expo source code is made available under the [MIT license](LICENSE). Some of the dependencies are licensed differently, with the BSD license, for example.
 
 <img alt="Star the Expo repo on GitHub to support the project" src="https://user-images.githubusercontent.com/9664363/185428788-d762fd5d-97b3-4f59-8db7-f72405be9677.gif" width="50%">
+import React, { useState, useEffect } from "react";
+import { View, Text, Button, StyleSheet } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { MapView } from "expo-maps";
+import * as Location from "expo-location";
+
+const Stack = createStackNavigator();
+
+function HomeScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>🚴 Courier App</Text>
+      <Button title="Open Map" onPress={() => navigation.navigate("Map")} />
+    </View>
+  );
+}
+
+function MapScreen() {
+  const [location, setLocation] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Location permission denied");
+        return;
+      }
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation.coords);
+    })();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      {location ? (
+        <MapView
+          style={{ flex: 1, width: "100%" }}
+          initialCamera={{
+            center: {
+              latitude: location.latitude,
+              longitude: location.longitude,
+            },
+            zoom: 14,
+          }}
+        />
+      ) : (
+        <Text>Loading map...</Text>
+      )}
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Map" component={MapScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 24, fontWeight: "bold" },
+});
